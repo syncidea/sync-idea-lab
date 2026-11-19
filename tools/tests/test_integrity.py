@@ -15,6 +15,9 @@ from generate import generate, package_files
 from pr_policy import classify, materialize_submission
 from audit_publication import audit_git
 
+TEST_TOPIC = {"id": "SIL-999", "slug": "stable-distinct", "category": "java-core",
+              "topic": "collections", "level": "Junior+", "status": "backlog", "fixture": "stable-distinct"}
+
 
 class RepositoryTest(unittest.TestCase):
     def setUp(self):
@@ -28,8 +31,8 @@ class RepositoryTest(unittest.TestCase):
         original = read_json(path)
         for key in ("id", "slug"):
             with self.subTest(key=key):
-                changed = read_json(ROOT / "catalog/topics.json")
-                changed["topics"][1][key] = changed["topics"][0][key]
+                changed = original.copy()
+                changed["topics"] = original["topics"] + [{**TEST_TOPIC, key: original["topics"][0][key]}]
                 write_json(path, changed)
                 with self.assertRaises(ValidationError):
                     validate_catalog(self.root)
@@ -59,21 +62,28 @@ class RepositoryTest(unittest.TestCase):
 
     def test_dry_run_is_deterministic_and_does_not_write(self):
         before = self.snapshot()
-        one = generate(self.root, "SIL-002", "fixture", False)
-        two = generate(self.root, "SIL-002", "fixture", False)
+        one = generate(self.root, None, "fixture", False, pending_topic=TEST_TOPIC)
+        two = generate(self.root, None, "fixture", False, pending_topic=TEST_TOPIC)
         self.assertEqual(one, two)
         self.assertEqual(before, self.snapshot())
 
-    def test_preparation_is_idempotent_and_preserves_editor_changes(self):
-        first = generate(self.root, "SIL-002", "fixture", True)
+    def test_preparation_is_idempotent_and_preserves_local_changes(self):
+        first = generate(self.root, None, "fixture", True, pending_topic=TEST_TOPIC)
         readme = self.root / first["module"] / "README.md"
-        readme.write_text(readme.read_text(encoding="utf-8") + "\nРедакторская заметка.\n", encoding="utf-8")
+        readme.write_text(readme.read_text(encoding="utf-8") + "\nДополнительный пример.\n", encoding="utf-8")
         before = self.snapshot()
-        retry = generate(self.root, None, "fixture", True)
+        retry = generate(self.root, None, "fixture", True, pending_topic=TEST_TOPIC)
         self.assertEqual(retry["status"], "already-prepared")
         self.assertFalse(retry["changed"])
         self.assertEqual(before, self.snapshot())
         self.assertEqual(2, len(validate_catalog(self.root)))
+
+    def test_local_topic_cannot_replace_existing_challenge(self):
+        before = self.snapshot()
+        existing_id = read_json(self.root / "catalog/topics.json")["topics"][0]["id"]
+        with self.assertRaisesRegex(ValidationError, "conflicts with an existing challenge"):
+            generate(self.root, None, "fixture", True, pending_topic={**TEST_TOPIC, "id": existing_id})
+        self.assertEqual(before, self.snapshot())
 
     def test_publication_without_external_check_is_rejected(self):
         path = next((self.root / "challenges").glob("*/*/challenge.json"))
@@ -84,14 +94,13 @@ class RepositoryTest(unittest.TestCase):
             validate_catalog(self.root)
 
     def test_provider_commands_and_path_traversal_are_rejected(self):
-        topic = read_json(self.root / "catalog/topics.json")["topics"][1]
         fixture = read_json(self.root / "tools/challenge_generator/fixtures/stable-distinct.json")
         for field, value in (("commands", ["echo not-executed"]), ("package", "../../escape"), ("class_name", "../Escape")):
             with self.subTest(field=field):
                 payload = dict(fixture)
                 payload[field] = value
                 with self.assertRaises(ValidationError):
-                    package_files(topic, payload)
+                    package_files(TEST_TOPIC, payload)
 
     def snapshot(self):
         return {p.relative_to(self.root).as_posix(): p.read_bytes() for p in self.root.rglob("*") if p.is_file()}

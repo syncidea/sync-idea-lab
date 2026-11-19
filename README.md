@@ -45,7 +45,7 @@ git switch -c submission/SIL-001
 
 Дальше запускайте команды из папки `sync-idea-lab`, где лежат `mvnw.cmd` и корневой `pom.xml`.
 Если работаете в IntelliJ IDEA, откройте эту папку как Maven-проект и выберите JDK 21 для проекта
-и Maven runner.
+и Maven Runner. [Настройка IDE и частые ошибки сборки](docs/getting-started.md).
 
 ## 3. Соберите задачу и напишите решение
 
