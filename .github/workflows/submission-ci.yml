@@ -1,0 +1,59 @@
+name: Submission CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: submission-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  submission:
+    name: submission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.14'
+      - name: Fetch exact head without checkout
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch --no-tags origin "refs/pull/$PR_NUMBER/head"
+          test "$(git rev-parse FETCH_HEAD)" = "$HEAD_SHA"
+      - name: Gate paths and copy Java sources into trusted build
+        id: policy
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: >-
+          python tools/pr_policy.py --base "$BASE_SHA" --head "$HEAD_SHA"
+          --event "$GITHUB_EVENT_PATH" --output "$RUNNER_TEMP/submission"
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        if: steps.policy.outputs.mode == 'submission'
+        with:
+          distribution: temurin
+          java-version: '21'
+          overwrite-settings: false
+      - name: Test selected challenge
+        if: steps.policy.outputs.mode == 'submission'
+        env:
+          CHALLENGE_ID: ${{ steps.policy.outputs.id }}
+        run: python tools/check_solution.py "$CHALLENGE_ID" --root "$RUNNER_TEMP/submission"
+      - name: Explain result
+        if: always()
+        run: |
+          echo 'Public tests: see Test selected challenge log.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Reproduce: python tools/check_solution.py SIL-NNN' >> "$GITHUB_STEP_SUMMARY"
+          echo 'A red publication-policy on a submission is intentional: review → close.' >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "contract_version": "1.0",
+  "id": "SIL-001",
+  "slug": "idempotency-registry",
+  "title": "Одно событие — одна обработка в пределах TTL",
+  "category": "java-core",
+  "topic": "concurrency-idempotency",
+  "level": "Middle",
+  "estimated_minutes": 90,
+  "skills": ["Concurrent collections", "Atomicity", "Clock", "JUnit 5"],
+  "prerequisites": ["Java 21", "Map", "java.time", "Основы многопоточности"],
+  "java_version": 21,
+  "status": "approved",
+  "publication_date": null,
+  "planned_publication_date": null,
+  "telegram_url": null,
+  "entrypoint": "src/main/java/dev/syncidea/lab/idempotency/IdempotencyRegistry.java",
+  "acceptance_criteria": [
+    "Первый запрос принят, повторный до истечения TTL отклонён",
+    "Ровно на границе TTL ключ можно принять снова",
+    "Отклонённый запрос не продлевает TTL",
+    "При одновременных запросах одного ключа принят ровно один",
+    "Ключи и экземпляры реестра независимы",
+    "Некорректные аргументы отклоняются по контракту"
+  ],
+  "reference_verified": true
+}

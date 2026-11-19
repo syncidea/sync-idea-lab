@@ -1,0 +1,22 @@
+name: Ошибка в задаче или инструментах
+description: Неоднозначность контракта, ошибка тестов, сборки или генератора
+title: '[bug] '
+body:
+  - type: input
+    id: challenge
+    attributes:
+      label: ID задания
+      placeholder: SIL-001 или tools
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Как воспроизвести
+      description: Версии JDK/ОС, команда, ожидаемый и фактический результат. Без секретов.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Предлагаемое уточнение

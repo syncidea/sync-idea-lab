@@ -1,0 +1,17 @@
+name: Идея учебной задачи
+description: Предложить небольшую практику для Sync IDEA
+title: '[idea] '
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Ситуация и проверяемые навыки
+      description: Тема, уровень, примерное время, границы. Не прикладывайте готовое решение.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Критерии приёмки
+    validations:
+      required: true
