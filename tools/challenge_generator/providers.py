@@ -18,5 +18,5 @@ class FixtureProvider:
 
 
 def get_provider(name: str) -> Provider:
-    require(name == "fixture", "Only fixture provider is enabled; paid API access requires owner approval")
+    require(name == "fixture", "Only fixture provider is enabled")
     return FixtureProvider()

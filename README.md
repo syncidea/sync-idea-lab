@@ -45,7 +45,7 @@ git switch -c submission/SIL-001
 
 Дальше запускайте команды из папки `sync-idea-lab`, где лежат `mvnw.cmd` и корневой `pom.xml`.
 Если работаете в IntelliJ IDEA, откройте эту папку как Maven-проект и выберите JDK 21 для проекта
-и Maven runner.
+и Maven Runner. [Настройка IDE и частые ошибки сборки](docs/getting-started.md).
 
 ## 3. Соберите задачу и напишите решение
 
@@ -82,7 +82,7 @@ git switch -c submission/SIL-001
 git status --short
 git add -- challenges/java-core/SIL-001-idempotency-registry/src/main/java
 git diff --cached --name-only
-git commit -m "Solve SIL-001"
+git commit -m "[submission SIL-001] Реестр идемпотентности"
 git push -u origin submission/SIL-001
 ```
 
@@ -93,7 +93,8 @@ git push -u origin submission/SIL-001
 | **base** — куда отправляете | `syncidea/sync-idea-lab` | `main` |
 | **head** — откуда берутся изменения | Ваш форк `ВАШ_ЛОГИН/sync-idea-lab` | `submission/SIL-001` |
 
-Укажите заголовок **`[submission SIL-001] Реестр идемпотентности`**. Заполните шаблон PR:
+Проверьте заголовок PR перед отправкой. Он должен начинаться с **`[submission SIL-001]`**.
+Например, `[submission SIL-001] Реестр идемпотентности`. Заполните шаблон PR:
 кратко опишите подход, укажите команду проверки и результат тестов. Решение и обсуждение будут
 видны публично. Для навигации по форме см. [инструкцию GitHub по PR из форка](https://docs.github.com/en/pull-requests/how-tos/create-pull-requests/creating-a-pull-request-from-a-fork).
 

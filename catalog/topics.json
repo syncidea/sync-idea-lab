@@ -1,8 +1,6 @@
 {
   "schema_version": 1,
   "topics": [
-    {"id": "SIL-001", "slug": "idempotency-registry", "category": "java-core", "topic": "concurrency-idempotency", "level": "Middle", "status": "approved", "fixture": null},
-    {"id": "SIL-002", "slug": "stable-distinct", "category": "java-core", "topic": "collections", "level": "Junior+", "status": "backlog", "fixture": "stable-distinct"},
-    {"id": "SIL-003", "slug": "validated-registration", "category": "spring-boot", "topic": "validation-transactions", "level": "Middle", "status": "backlog", "fixture": null}
+    {"id": "SIL-001", "slug": "idempotency-registry", "category": "java-core", "topic": "concurrency-idempotency", "level": "Middle", "status": "approved", "fixture": null}
   ]
 }

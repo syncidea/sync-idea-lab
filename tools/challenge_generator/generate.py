@@ -55,20 +55,34 @@ def package_files(topic: dict, payload: dict) -> dict[str, str]:
             "pom.xml": pom, entrypoint: payload["main_source"], f"src/test/java/{relative}Test.java": payload["test_source"]}
 
 
-def select_topic(root: Path, challenge_id: str | None) -> dict:
-    topics = read_json(root / "catalog/topics.json")["topics"]
+def select_topic(topics: list[dict], challenge_id: str | None) -> dict:
     if challenge_id:
         found = [t for t in topics if t["id"] == challenge_id]
     else:
         # First pending fixture topic by ID, including existing draft: retry is idempotent.
         found = sorted((t for t in topics if t["fixture"] and t["status"] in {"backlog", "draft"}), key=lambda t: t["id"])
-    require(bool(found), "No eligible topic; choose an ID with a reviewed fixture")
+    require(bool(found), "No eligible topic; pass --topic-file with a local topic")
     return found[0]
 
 
-def generate(root: Path, challenge_id: str | None, provider_name: str, prepare: bool) -> dict:
+def generate(root: Path, challenge_id: str | None, provider_name: str, prepare: bool, *,
+             pending_topic: dict | None = None) -> dict:
     validate_catalog(root)
-    topic = select_topic(root, challenge_id)
+    topics = read_json(root / "catalog/topics.json")
+    if pending_topic is not None:
+        topic_keys = {"id", "slug", "category", "topic", "level", "status", "fixture"}
+        require(isinstance(pending_topic, dict) and set(pending_topic) == topic_keys, "Invalid local topic fields")
+        require(pending_topic["status"] == "backlog", "Local topic must have backlog status")
+        module_path(pending_topic)
+        require(challenge_id is None or challenge_id == pending_topic["id"], "ID does not match local topic")
+        challenge_id = pending_topic["id"]
+        existing = next((entry for entry in topics["topics"] if entry["id"] == challenge_id), None)
+        if existing is None:
+            topics["topics"].append(pending_topic.copy())
+        else:
+            require(all(existing[key] == pending_topic[key] for key in topic_keys - {"status"}),
+                    "Local topic conflicts with an existing challenge")
+    topic = select_topic(topics["topics"], challenge_id)
     module = module_path(topic)
     if topic["status"] != "backlog":
         require((root / module / "challenge.json").is_file(), "Prepared topic missing package")
@@ -87,7 +101,6 @@ def generate(root: Path, challenge_id: str | None, provider_name: str, prepare: 
             target = staged / module / name
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(content, encoding="utf-8")
-        topics = read_json(staged / "catalog/topics.json")
         next(t for t in topics["topics"] if t["id"] == topic["id"])["status"] = "draft"
         write_json(staged / "catalog/topics.json", topics)
         pom = (staged / "pom.xml").read_text(encoding="utf-8")
@@ -118,12 +131,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--id")
+    parser.add_argument("--topic-file", type=Path, help="Local JSON object with a single backlog topic")
     parser.add_argument("--provider", choices=["fixture"], default="fixture")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true")
     mode.add_argument("--prepare", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(generate(args.root.resolve(), args.id, args.provider, args.prepare), ensure_ascii=False, indent=2))
+    pending_topic = read_json(args.topic_file) if args.topic_file is not None else None
+    require(args.topic_file is None or isinstance(pending_topic, dict), "Topic file must contain an object")
+    plan = generate(args.root.resolve(), args.id, args.provider, args.prepare, pending_topic=pending_topic)
+    print(json.dumps(plan, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
