@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "contract_version": "1.0",
+  "id": "SIL-005",
+  "slug": "booking-window",
+  "title": "Проверьте окно бронирования",
+  "category": "java-core",
+  "topic": "java-time-boundaries",
+  "level": "Easy",
+  "estimated_minutes": 20,
+  "skills": [
+    "LocalTime",
+    "Интервалы",
+    "Проверка аргументов"
+  ],
+  "prerequisites": [
+    "Java 21",
+    "Логические выражения",
+    "LocalTime"
+  ],
+  "java_version": 21,
+  "status": "published",
+  "publication_date": "2026-11-25",
+  "planned_publication_date": null,
+  "telegram_url": null,
+  "entrypoint": "src/main/java/dev/syncidea/lab/booking/BookingWindow.java",
+  "acceptance_criteria": [
+    "Время открытия включено, закрытия исключено",
+    "За наносекунду до закрытия окно открыто",
+    "Нулевой интервал пуст",
+    "Некорректные аргументы отклоняются"
+  ],
+  "reference_verified": true
+}

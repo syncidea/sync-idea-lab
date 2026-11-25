@@ -1,4 +1,9 @@
 {
   "schema_version": 1,
-  "challenges": []
+  "challenges": [
+    {"id": "SIL-002", "slug": "low-stock-counter", "publication_date": "2026-11-25"},
+    {"id": "SIL-003", "slug": "username-normalizer", "publication_date": "2026-11-25"},
+    {"id": "SIL-004", "slug": "order-status-counter", "publication_date": "2026-11-25"},
+    {"id": "SIL-005", "slug": "booking-window", "publication_date": "2026-11-25"}
+  ]
 }

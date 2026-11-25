@@ -9,6 +9,18 @@ from validate_challenge import validate_challenge
 SKIP = {".git", "target", "__pycache__", ".idea", ".vscode", ".local", ".private"}
 FORBIDDEN = {"solutions", "reference-solutions", "reference", "private", "hidden-tests"}
 SECRET = re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bgh[pousr]_[A-Za-z0-9]{30,}|\bsk-(?:proj-)?[A-Za-z0-9_-]{32,}")
+PUBLIC_PNG = re.compile(r"docs/assets/[a-z0-9]+(?:-[a-z0-9]+)*\.png\Z")
+MAX_PUBLIC_BYTES = 2_000_000
+
+
+def validate_public_png(path: str, data: bytes) -> None:
+    require(PUBLIC_PNG.fullmatch(path) is not None, f"PNG must be in docs/assets: {path}")
+    require(45 <= len(data) < MAX_PUBLIC_BYTES, f"Invalid PNG size: {path}")
+    require(data.startswith(b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR")
+            and data.endswith(b"\x00\x00\x00\x00IEND\xaeB`\x82"), f"Invalid PNG header or footer: {path}")
+    width = int.from_bytes(data[16:20], "big")
+    height = int.from_bytes(data[20:24], "big")
+    require(0 < width <= 4096 and 0 < height <= 4096, f"Invalid PNG dimensions: {path}")
 
 
 def public_files(root: Path):
@@ -75,8 +87,14 @@ def validate_catalog(root: Path, scan: bool = True):
             require(not p.name.startswith(".env"), f"Environment file forbidden: {rel}")
             require(rel == "tools/check_solution.py" or not re.search(
                 r"(?:^|[._-])(?:solution|reference|hidden-test)(?:[._-]|$)", p.name.lower()), f"Suspicious public file: {rel}")
-            require(p.stat().st_size < 2_000_000, f"Oversize public file: {rel}")
-            require(SECRET.search(p.read_text(encoding="utf-8")) is None, f"Possible secret in {rel}")
+            require(p.stat().st_size < MAX_PUBLIC_BYTES, f"Oversize public file: {rel}")
+            data = p.read_bytes()
+            if p.suffix.lower() == ".png":
+                validate_public_png(rel, data)
+                text = data.decode("utf-8", errors="replace")
+            else:
+                text = data.decode("utf-8")
+            require(SECRET.search(text) is None, f"Possible secret in {rel}")
     return metas
 
 

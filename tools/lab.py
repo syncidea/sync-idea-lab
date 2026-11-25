@@ -19,7 +19,7 @@ ID_RE = re.compile(r"SIL-[0-9]{3,5}\Z")
 SLUG_RE = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*\Z")
 STATUSES = {"backlog", "draft", "approved", "published"}
 CATEGORIES = {"java-core", "spring-boot", "persistence", "sql", "messaging"}
-LEVELS = {"Junior+", "Middle", "Middle+/Senior"}
+LEVELS = {"Easy", "Junior+", "Middle", "Middle+/Senior"}
 NS = {"m": "http://maven.apache.org/POM/4.0.0"}
 
 

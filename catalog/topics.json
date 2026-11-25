@@ -1,6 +1,10 @@
 {
   "schema_version": 1,
   "topics": [
-    {"id": "SIL-001", "slug": "idempotency-registry", "category": "java-core", "topic": "concurrency-idempotency", "level": "Middle", "status": "approved", "fixture": null}
+    {"id": "SIL-001", "slug": "idempotency-registry", "category": "java-core", "topic": "concurrency-idempotency", "level": "Middle", "status": "approved", "fixture": null},
+    {"id": "SIL-002", "slug": "low-stock-counter", "category": "java-core", "topic": "arrays-loops", "level": "Easy", "status": "published", "fixture": null},
+    {"id": "SIL-003", "slug": "username-normalizer", "category": "java-core", "topic": "strings-locale", "level": "Easy", "status": "published", "fixture": null},
+    {"id": "SIL-004", "slug": "order-status-counter", "category": "java-core", "topic": "lists-maps-enums", "level": "Easy", "status": "published", "fixture": null},
+    {"id": "SIL-005", "slug": "booking-window", "category": "java-core", "topic": "java-time-boundaries", "level": "Easy", "status": "published", "fixture": null}
   ]
 }

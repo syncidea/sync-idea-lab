@@ -2,9 +2,11 @@
 import subprocess
 
 from lab import ROOT, require, main_guard
-from validate_catalog import SECRET
+from validate_catalog import SECRET, validate_public_png
 
 FORBIDDEN_PARTS = {".private", ".local", "private", "solutions", "reference-solutions", "reference", "hidden-tests", "target"}
+STARTER_CLASSES = {"idempotencyregistry.java", "stabledistinct.java", "stockcounter.java",
+                   "usernamenormalizer.java", "orderstatuscounter.java", "bookingwindow.java"}
 
 
 def check_blob(path: str, data: bytes):
@@ -14,9 +16,11 @@ def check_blob(path: str, data: bytes):
     require(parts[-1] not in {"project_brief.md", "sync_idea_lab_codex_brief.md"},
             "Local project brief must stay outside the public index")
     require(not path.endswith((".pem", ".key", ".jks", ".p12", ".jar", ".class", ".zip")), f"Forbidden Git artifact: {path}")
+    if parts[-1].endswith(".png"):
+        validate_public_png(path, data)
     text = data.decode("utf-8", errors="replace")
     require(SECRET.search(text) is None, f"Possible secret in Git blob: {path}")
-    if path.endswith("/IdempotencyRegistry.java") or path.endswith("/StableDistinct.java"):
+    if "/src/main/java/" in path and parts[-1] in STARTER_CLASSES:
         require("UnsupportedOperationException" in text, f"Possible completed starter in Git history: {path}")
 
 
