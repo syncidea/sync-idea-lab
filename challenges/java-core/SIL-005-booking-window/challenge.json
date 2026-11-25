@@ -19,8 +19,8 @@
     "LocalTime"
   ],
   "java_version": 21,
-  "status": "approved",
-  "publication_date": null,
+  "status": "published",
+  "publication_date": "2026-11-25",
   "planned_publication_date": null,
   "telegram_url": null,
   "entrypoint": "src/main/java/dev/syncidea/lab/booking/BookingWindow.java",
