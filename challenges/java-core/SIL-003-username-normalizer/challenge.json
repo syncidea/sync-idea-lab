@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "contract_version": "1.0",
+  "id": "SIL-003",
+  "slug": "username-normalizer",
+  "title": "Приведите имя к единому виду",
+  "category": "java-core",
+  "topic": "strings-locale",
+  "level": "Easy",
+  "estimated_minutes": 20,
+  "skills": [
+    "Строки",
+    "Пробельные символы",
+    "Locale"
+  ],
+  "prerequisites": [
+    "Java 21",
+    "String"
+  ],
+  "java_version": 21,
+  "status": "approved",
+  "publication_date": null,
+  "planned_publication_date": null,
+  "telegram_url": null,
+  "entrypoint": "src/main/java/dev/syncidea/lab/names/UsernameNormalizer.java",
+  "acceptance_criteria": [
+    "Краевые пробельные символы удаляются по правилам String.strip()",
+    "Регистр меняется одинаково при любой системной локали",
+    "Внутренние пробелы и знаки сохраняются",
+    "Пустой ввод и null обрабатываются по контракту"
+  ],
+  "reference_verified": true
+}

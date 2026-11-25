@@ -15,6 +15,10 @@
   </properties>
   <modules>
     <module>challenges/java-core/SIL-001-idempotency-registry</module>
+    <module>challenges/java-core/SIL-002-low-stock-counter</module>
+    <module>challenges/java-core/SIL-003-username-normalizer</module>
+    <module>challenges/java-core/SIL-004-order-status-counter</module>
+    <module>challenges/java-core/SIL-005-booking-window</module>
   </modules>
   <dependencyManagement>
     <dependencies>

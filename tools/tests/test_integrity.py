@@ -13,7 +13,7 @@ from lab import ROOT, ValidationError, read_json, write_json
 from validate_catalog import validate_catalog
 from generate import generate, package_files
 from pr_policy import classify, materialize_submission
-from audit_publication import audit_git
+from audit_publication import audit_git, check_blob
 
 TEST_TOPIC = {"id": "SIL-999", "slug": "stable-distinct", "category": "java-core",
               "topic": "collections", "level": "Junior+", "status": "backlog", "fixture": "stable-distinct"}
@@ -67,7 +67,19 @@ class RepositoryTest(unittest.TestCase):
         self.assertEqual(one, two)
         self.assertEqual(before, self.snapshot())
 
+    def test_catalog_and_audit_validate_png_assets(self):
+        relative = "docs/assets/sync-idea-lab.png"
+        png = self.root / relative
+        check_blob(relative, png.read_bytes())
+        validate_catalog(self.root)
+        png.write_bytes(b"text disguised as a PNG")
+        with self.assertRaises(ValidationError):
+            validate_catalog(self.root)
+        with self.assertRaises(ValidationError):
+            check_blob(relative, png.read_bytes())
+
     def test_preparation_is_idempotent_and_preserves_local_changes(self):
+        initial_count = len(validate_catalog(self.root))
         first = generate(self.root, None, "fixture", True, pending_topic=TEST_TOPIC)
         readme = self.root / first["module"] / "README.md"
         readme.write_text(readme.read_text(encoding="utf-8") + "\nДополнительный пример.\n", encoding="utf-8")
@@ -76,7 +88,7 @@ class RepositoryTest(unittest.TestCase):
         self.assertEqual(retry["status"], "already-prepared")
         self.assertFalse(retry["changed"])
         self.assertEqual(before, self.snapshot())
-        self.assertEqual(2, len(validate_catalog(self.root)))
+        self.assertEqual(initial_count + 1, len(validate_catalog(self.root)))
 
     def test_local_topic_cannot_replace_existing_challenge(self):
         before = self.snapshot()

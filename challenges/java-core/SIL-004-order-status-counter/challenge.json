@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "contract_version": "1.0",
+  "id": "SIL-004",
+  "slug": "order-status-counter",
+  "title": "Посчитайте заказы по статусам",
+  "category": "java-core",
+  "topic": "lists-maps-enums",
+  "level": "Easy",
+  "estimated_minutes": 20,
+  "skills": [
+    "List",
+    "Map",
+    "enum"
+  ],
+  "prerequisites": [
+    "Java 21",
+    "Коллекции List и Map"
+  ],
+  "java_version": 21,
+  "status": "approved",
+  "publication_date": null,
+  "planned_publication_date": null,
+  "telegram_url": null,
+  "entrypoint": "src/main/java/dev/syncidea/lab/orders/OrderStatusCounter.java",
+  "acceptance_criteria": [
+    "Каждый встретившийся статус получает точный счётчик",
+    "Отсутствующие статусы опущены",
+    "Повторный вызов независим от предыдущего",
+    "Вход остаётся неизменным, null отклоняется"
+  ],
+  "reference_verified": true
+}

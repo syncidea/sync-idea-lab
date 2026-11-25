@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "contract_version": "1.0",
+  "id": "SIL-002",
+  "slug": "low-stock-counter",
+  "title": "Какие товары нужно пополнить",
+  "category": "java-core",
+  "topic": "arrays-loops",
+  "level": "Easy",
+  "estimated_minutes": 15,
+  "skills": [
+    "Массивы",
+    "Циклы",
+    "Граничные значения"
+  ],
+  "prerequisites": [
+    "Java 21",
+    "Массивы int",
+    "Условия и циклы"
+  ],
+  "java_version": 21,
+  "status": "approved",
+  "publication_date": null,
+  "planned_publication_date": null,
+  "telegram_url": null,
+  "entrypoint": "src/main/java/dev/syncidea/lab/stock/StockCounter.java",
+  "acceptance_criteria": [
+    "Остаток, равный порогу, учитывается",
+    "Нулевой порог учитывает только нулевые остатки",
+    "Некорректные данные вызывают оговорённые исключения",
+    "Порядок и значения массива сохраняются"
+  ],
+  "reference_verified": true
+}
